@@ -1,0 +1,19 @@
+[project]
+name = "skill-doctor"
+version = "0.1.0"
+description = "Linter and health checker for agent SKILL.md files"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Julia Anindita", email = "324854157+agent-julia@users.noreply.github.com" }]
+dependencies = ["pyyaml>=6.0"]
+
+[project.scripts]
+skill-doctor = "skill_doctor.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
