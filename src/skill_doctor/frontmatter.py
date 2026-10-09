@@ -7,6 +7,8 @@ from pathlib import Path
 
 import yaml
 
+DELIM = "---"
+
 
 @dataclass
 class SkillFile:
@@ -25,18 +27,19 @@ def parse_skill(path: Path) -> SkillFile:
     frontmatter: dict = {}
     body = raw
     yaml_error = None
-    if raw.startswith("---"):
-        end = raw.find("\n---", 3)
+    if raw.startswith(DELIM):
+        end = raw.find("\n" + DELIM, len(DELIM))
         if end != -1:
             try:
-                loaded = yaml.safe_load(raw[3:end])
+                loaded = yaml.safe_load(raw[len(DELIM) : end])
                 if isinstance(loaded, dict):
                     frontmatter = loaded
                 elif loaded is not None:
                     yaml_error = "frontmatter is not a mapping"
             except yaml.YAMLError as exc:
                 yaml_error = str(exc).split("\n")[0]
-            body = raw[end + 4 :]
+            # skip the closing delimiter plus its newline
+            body = raw[end + len(DELIM) + 1 :]
         else:
             yaml_error = "opening --- has no closing ---"
     return SkillFile(path=path, frontmatter=frontmatter, body=body, raw=raw, yaml_error=yaml_error)
