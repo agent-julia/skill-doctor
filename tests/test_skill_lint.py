@@ -69,6 +69,11 @@ def test_pruned_marker(tmp_path):
     assert any(f.rule == "no-pruned-marker" and f.severity == "error" for f in rule_pruned_marker(skill, HERMES))
 
 
+def test_pruned_marker_ignored_in_code_span(tmp_path):
+    skill = parse_skill(write_skill(tmp_path, GOOD + "\nDocs mention `[SKILL_PRUNED]` inline.\n"))
+    assert rule_pruned_marker(skill, HERMES) == []
+
+
 def test_malformed_yaml(tmp_path):
     skill = parse_skill(write_skill(tmp_path, "---\nname: [unclosed\n---\n# Body\n"))
     assert skill.yaml_error is not None

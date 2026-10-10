@@ -143,7 +143,10 @@ def rule_compatibility_length(skill: SkillFile, profile: Profile) -> list[Findin
 
 
 def rule_pruned_marker(skill: SkillFile, profile: Profile) -> list[Finding]:
-    if PRUNED_MARK in skill.raw:
+    # documentation may quote the marker inside code spans/blocks — ignore those
+    body = re.sub(r"```.*?```", "", skill.raw, flags=re.S)
+    body = re.sub(r"`[^`\n]*`", "", body)
+    if PRUNED_MARK in body:
         return [Finding(
             "error", "no-pruned-marker", f"contains '{PRUNED_MARK}'; skill lost content to compaction — reload it", skill.path,
             suggestion="reload the skill with skill_view(name='...')")]
