@@ -1,10 +1,10 @@
-"""Tests for skill-doctor rules and CLI."""
+"""Tests for skill-lint rules and CLI."""
 
 from pathlib import Path
 
-from skill_doctor.cli import main
-from skill_doctor.frontmatter import parse_skill
-from skill_doctor.rules import (
+from skill_lint.cli import main
+from skill_lint.frontmatter import parse_skill
+from skill_lint.rules import (
     HERMES,
     SPEC,
     find_duplicate_names,

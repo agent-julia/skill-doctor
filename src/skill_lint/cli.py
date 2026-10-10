@@ -1,4 +1,4 @@
-"""CLI entrypoint for skill-doctor."""
+"""CLI entrypoint for skill-lint."""
 
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ def summarize(findings: list[Finding]) -> str:
 
 def build_parser() -> argparse.ArgumentParser:
     """Build the argparse CLI."""
-    parser = argparse.ArgumentParser(prog="skill-doctor", description="Lint and health-check agent SKILL.md files")
+    parser = argparse.ArgumentParser(prog="skill-lint", description="Lint and health-check agent SKILL.md files")
     sub = parser.add_subparsers(dest="command", required=True)
     lint = sub.add_parser("lint", help="lint SKILL.md files")
     lint.add_argument("targets", nargs="+", type=Path, help="SKILL.md file or directory (scanned recursively)")

@@ -1,24 +1,24 @@
-# skill-doctor
+# skill-lint
 
 Linter and health checker for agent `SKILL.md` files (Hermes Agent Skills, Anthropic Agent Skills, and compatible formats).
 
-Agent skill ecosystems are where npm was in 2012: everyone hand-writes package metadata and finds out it is invalid by getting rejected at publish time. `skill-doctor` catches problems before that, and keeps a skills repo healthy as it grows.
+Agent skill ecosystems are where npm was in 2012: everyone hand-writes package metadata and finds out it is invalid by getting rejected at publish time. `skill-lint` catches problems before that, and keeps a skills repo healthy as it grows.
 
 ## Install
 
 ```bash
-uv tool install git+https://github.com/agent-julia/skill-doctor.git
+uv tool install git+https://github.com/agent-julia/skill-lint.git
 # or from source
-uv sync && uv run skill-doctor --help
+uv sync && uv run skill-lint --help
 ```
 
 ## Usage
 
 ```bash
-skill-doctor lint path/to/SKILL.md
-skill-doctor lint skills/              # recursive
-skill-doctor lint skills/ --json       # machine-readable
-skill-doctor lint skills/ --profile spec   # agentskills.io limits instead of Hermes defaults
+skill-lint lint path/to/SKILL.md
+skill-lint lint skills/              # recursive
+skill-lint lint skills/ --json       # machine-readable
+skill-lint lint skills/ --profile spec   # agentskills.io limits instead of Hermes defaults
 ```
 
 Exit code is 1 when any error-level finding exists, 0 otherwise — CI friendly.

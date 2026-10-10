@@ -1,5 +1,5 @@
 [project]
-name = "skill-doctor"
+name = "skill-lint"
 version = "0.3.0"
 description = "Linter and health checker for agent SKILL.md files"
 readme = "README.md"
@@ -9,7 +9,7 @@ authors = [{ name = "Julia Anindita", email = "324854157+agent-julia@users.norep
 dependencies = ["pyyaml>=6.0"]
 
 [project.scripts]
-skill-doctor = "skill_doctor.cli:main"
+skill-lint = "skill_lint.cli:main"
 
 [build-system]
 requires = ["hatchling"]
