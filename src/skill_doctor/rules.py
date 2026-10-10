@@ -19,8 +19,13 @@ TOKEN_WARN = 4000
 SEVERITY_ORDER = {"error": 0, "warn": 1, "info": 2}
 
 NAME_RE = re.compile(r"^[a-z0-9][a-z0-9\-_]*$")
-ASSET_RE = re.compile(r"\b(references|templates|scripts)/[\w\-./]+")
+# path segment: word chars/hyphens with at most one extension dot, so a
+# trailing sentence period is not swallowed into the match
+SEG = r"[\w\-]+(?:\.[\w\-]+)?"
+ASSET_RE = re.compile(r"\b(references|templates|scripts)/" + SEG + r"(?:/" + SEG + r")*")
 PRUNED_MARK = "[SKILL_PRUNED]"
+
+ASSET_DIRS = ("references", "templates", "scripts")
 
 
 @dataclass
@@ -108,8 +113,24 @@ def rule_asset_refs(skill: SkillFile) -> list[Finding]:
         if rel in checked:
             continue
         checked.add(rel)
-        if not (skill.path.parent / rel).exists():
+        target = skill.path.parent / rel
+        if not target.exists():
             findings.append(Finding("warn", "asset-refs", f"referenced file '{rel}' does not exist", skill.path))
+        elif rel.startswith("scripts/") and not target.stat().st_mode & 0o111:
+            findings.append(Finding("warn", "script-executable", f"'{rel}' is referenced but not executable", skill.path))
+    return findings
+
+
+def rule_asset_orphan(skill: SkillFile) -> list[Finding]:
+    findings = []
+    mentioned = {m.group(0) for m in ASSET_RE.finditer(skill.body)}
+    for dirname in ASSET_DIRS:
+        dirpath = skill.path.parent / dirname
+        if not dirpath.is_dir():
+            continue
+        files = [p for p in dirpath.rglob("*") if p.is_file()]
+        if files and not any(str(p.relative_to(skill.path.parent)) in mentioned for p in files):
+            findings.append(Finding("warn", "asset-orphan", f"directory '{dirname}/' has {len(files)} file(s) but none are referenced in the body", skill.path))
     return findings
 
 
@@ -130,6 +151,7 @@ RULES: list[tuple[str, Callable[[SkillFile], list[Finding]]]] = [
     ("no-pruned-marker", rule_pruned_marker),
     ("body-size", rule_body_size),
     ("asset-refs", rule_asset_refs),
+    ("asset-orphan", rule_asset_orphan),
     ("token-estimate", rule_token_estimate),
 ]
 

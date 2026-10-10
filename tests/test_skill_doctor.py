@@ -87,6 +87,30 @@ def test_asset_refs_missing(tmp_path):
     assert any(f.rule == "asset-refs" for f in lint_skill(skill))
 
 
+def test_asset_orphan_warns(tmp_path):
+    refs = tmp_path / "references"
+    refs.mkdir()
+    (refs / "notes.md").write_text("notes")
+    skill = parse_skill(write_skill(tmp_path, GOOD))
+    assert any(f.rule == "asset-orphan" and "references/" in f.message for f in lint_skill(skill))
+
+
+def test_asset_orphan_silent_when_referenced(tmp_path):
+    refs = tmp_path / "references"
+    refs.mkdir()
+    (refs / "notes.md").write_text("notes")
+    skill = parse_skill(write_skill(tmp_path, GOOD + "\nSee references/notes.md.\n"))
+    assert not any(f.rule == "asset-orphan" for f in lint_skill(skill))
+
+
+def test_script_not_executable_warns(tmp_path):
+    scripts = tmp_path / "scripts"
+    scripts.mkdir()
+    (scripts / "run.sh").write_text("#!/bin/sh\n")
+    skill = parse_skill(write_skill(tmp_path, GOOD + "\nRun scripts/run.sh.\n"))
+    assert any(f.rule == "script-executable" for f in lint_skill(skill))
+
+
 def test_cli_exit_codes(tmp_path, capsys):
     write_skill(tmp_path, GOOD)
     assert main(["lint", str(tmp_path)]) == 0

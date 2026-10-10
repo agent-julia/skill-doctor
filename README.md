@@ -30,7 +30,9 @@ Exit code is 1 when any error-level finding exists, 0 otherwise — CI friendly.
 - `description-trigger` — first 57 chars should be a self-contained trigger (`Use when ...`)
 - `no-pruned-marker` — flags `[SKILL_PRUNED]`, the marker left when a skill loses content to context compaction
 - `body-size` — warn if thinner than 5 lines or heavier than 250 lines
-- `asset-refs` — `references/`, `templates/`, `scripts/` paths mentioned in the body must exist
+- `asset-refs` — `references/`, `templates/`, `scripts/` paths mentioned in the body must exist (dead-link check)
+- `asset-orphan` — a `references/`, `templates/`, or `scripts/` directory with files that no body text links to
+- `script-executable` — referenced files under `scripts/` must have the executable bit
 - `token-estimate` — rough tokens-on-load estimate, warn above 4000
 - `duplicate-name` (repo-level) — two SKILL.md files claiming the same name
 
