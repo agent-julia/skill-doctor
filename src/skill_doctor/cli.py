@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 from .frontmatter import parse_skill
-from .rules import SEVERITY_ORDER, Finding, find_duplicate_names, lint_skill
+from .rules import PROFILES, SEVERITY_ORDER, Finding, find_duplicate_names, lint_skill
 
 
 def iter_skill_files(target: Path) -> list[Path]:
@@ -18,7 +18,7 @@ def iter_skill_files(target: Path) -> list[Path]:
     return sorted(target.rglob("SKILL.md"))
 
 
-def lint_targets(targets: list[Path]) -> list[Finding]:
+def lint_targets(targets: list[Path], profile) -> list[Finding]:
     """Lint all SKILL.md files under the given targets."""
     files: list[Path] = []
     for target in targets:
@@ -30,7 +30,7 @@ def lint_targets(targets: list[Path]) -> list[Finding]:
     skills = [parse_skill(path) for path in files]
     findings: list[Finding] = []
     for skill in skills:
-        findings.extend(lint_skill(skill))
+        findings.extend(lint_skill(skill, profile))
     findings.extend(find_duplicate_names(skills))
     return findings
 
@@ -48,13 +48,14 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
     lint = sub.add_parser("lint", help="lint SKILL.md files")
     lint.add_argument("targets", nargs="+", type=Path, help="SKILL.md file or directory (scanned recursively)")
+    lint.add_argument("--profile", choices=sorted(PROFILES), default="hermes", help="lint flavor: hermes (default, strict 64-char description) or spec (agentskills.io limits)")
     lint.add_argument("--json", action="store_true", help="machine-readable JSON output")
     return parser
 
 
 def cmd_lint(args: argparse.Namespace) -> int:
     """Run the lint command."""
-    findings = lint_targets(args.targets)
+    findings = lint_targets(args.targets, PROFILES[args.profile])
     findings.sort(key=lambda f: (SEVERITY_ORDER[f.severity], str(f.path), f.rule))
     if args.json:
         print(json.dumps([f.__dict__ | {"path": str(f.path)} for f in findings], indent=2))

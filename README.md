@@ -18,16 +18,24 @@ uv sync && uv run skill-doctor --help
 skill-doctor lint path/to/SKILL.md
 skill-doctor lint skills/              # recursive
 skill-doctor lint skills/ --json       # machine-readable
+skill-doctor lint skills/ --profile spec   # agentskills.io limits instead of Hermes defaults
 ```
 
 Exit code is 1 when any error-level finding exists, 0 otherwise — CI friendly.
 
+## Profiles
+
+- `hermes` (default) — Hermes Agent Skills limits: description max 64 chars, trigger phrase required
+- `spec` — agentskills.io limits: description max 1024, compatibility max 500, no trigger requirement
+
 ## Checks
 
 - `yaml-parseable` — frontmatter must be valid YAML mapping
+- `frontmatter-typos` — unknown keys that look like misspellings of known ones (`descrption` → `description`)
 - `name-present`, `name-format` — required, `^[a-z0-9][a-z0-9\-_]*$`, max 64 chars
-- `description-present`, `description-length` — required, max 64 chars
-- `description-trigger` — first 57 chars should be a self-contained trigger (`Use when ...`)
+- `description-present`, `description-length` — required, within profile limit
+- `description-trigger` — first 57 chars should be a self-contained trigger (`Use when ...`); hermes profile only
+- `compatibility-length` — within profile limit; spec profile only
 - `no-pruned-marker` — flags `[SKILL_PRUNED]`, the marker left when a skill loses content to context compaction
 - `body-size` — warn if thinner than 5 lines or heavier than 250 lines
 - `asset-refs` — `references/`, `templates/`, `scripts/` paths mentioned in the body must exist (dead-link check)
@@ -35,6 +43,9 @@ Exit code is 1 when any error-level finding exists, 0 otherwise — CI friendly.
 - `script-executable` — referenced files under `scripts/` must have the executable bit
 - `token-estimate` — rough tokens-on-load estimate, warn above 4000
 - `duplicate-name` (repo-level) — two SKILL.md files claiming the same name
+
+Findings that have an obvious fix carry a `fix:` suggestion line (and a
+`suggestion` field in JSON output).
 
 ## Design
 
